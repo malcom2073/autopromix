@@ -36,6 +36,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent)
 	connect(ui.listWidget,SIGNAL(currentRowChanged(int)),this,SLOT(currentItemRowChanged(int)));
 	connect(ui.connectPushButton,SIGNAL(clicked()),this,SLOT(connectButtonClicked()));
 	connect(ui.ripPushButton,SIGNAL(clicked()),this,SLOT(ripButtonClicked()));
+	connect(ui.writeBinaryButton,SIGNAL(clicked()),this,SLOT(writeButtonClicked()));
 
 	/*QFile file("/home/michael/EBL/EBL_V21.XDF");
 	file.open(QIODevice::ReadOnly);
@@ -151,12 +152,33 @@ void MainWindow::connectButtonClicked()
 
 void MainWindow::ripButtonClicked()
 {
+	QByteArray total = apuOne.read(0x10000,0);
+	QByteArray midone = apuOne.read(0x1234,0);
+
+	if (total.mid(0,0x1234) == midone)
+	{
+		qDebug() << "Success one";
+	}
+	else
+	{
+		qDebug() << "failure one";
+	}
+	QByteArray midtwo = apuOne.read(0x1234,0x123);
+	if (total.mid(0x123,0x1234) == midtwo)
+	{
+		qDebug() << "Success two";
+	}
+	else
+	{
+		qDebug() << "failure two";
+	}
+	return;
 	QString ripoffsettext = ui.ripOffsetLineEdit->text();
 	QString ripsizetext = ui.ripSizeLineEdit->text();
 	QString filename = QFileDialog::getSaveFileName(0,"Save Binary File");
 	if (filename != "")
 	{
-		QByteArray getbytes = apuOne.get();
+		QByteArray getbytes = apuOne.getBulk();
 		if (getbytes.size() == 0)
 		{
 			QMessageBox::information(0,"Error","Error getting binary from device");
@@ -528,4 +550,17 @@ QString MainWindow::calc(QString str)
 	}
 	}
 	return str;
+}
+void MainWindow::writeButtonClicked()
+{
+	QString filename = QFileDialog::getOpenFileName();
+	if (filename == "")
+	{
+		return ;
+	}
+	QFile hexfile(filename);
+	hexfile.open(QIODevice::ReadOnly);
+	QByteArray hexbytes = hexfile.readAll();
+	hexfile.close();
+	apuOne.write(hexbytes,0);
 }

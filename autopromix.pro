@@ -9,6 +9,7 @@ QT       += core gui
 TARGET = autopromix
 TEMPLATE = app
 
+include(serialport/apmserial.pri)
 
 SOURCES += main.cpp\
         mainwindow.cpp \

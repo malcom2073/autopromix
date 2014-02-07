@@ -39,6 +39,7 @@ private slots:
 	void currentItemRowChanged(int item);
 	void connectButtonClicked();
 	void ripButtonClicked();
+	void writeButtonClicked();
 private:
 	bool connected;
 	ApuOne apuOne;

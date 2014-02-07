@@ -36,9 +36,13 @@
 #endif
 #include <vector>
 #include <QDebug>
+#include <QThread>
 #include <QFile>
+#include <QMutex>
 
-class ApuOne : public QObject
+#include "qserialport.h"
+
+class ApuOne : public QThread
 {
 	Q_OBJECT
 public:
@@ -46,13 +50,31 @@ public:
 	void openPort(QString portName);
 	void closePort();
 	QString getVersion();
-	QByteArray get(unsigned char size=0,unsigned char offset=0);
+	QByteArray getBulk(unsigned char size=0,unsigned char offset=0);
+	QByteArray get(unsigned char size,unsigned short offset);
 	bool verify(QString filename,unsigned char size=0,unsigned char offset=0);
 	void saveAll(QString filename);
+	void write(QByteArray buffer,unsigned short offset);
+	QByteArray read(unsigned int size,unsigned short offset);
+protected:
+	void run();
 private:
+	class RequestClass
+	{
+	public:
+		QString type;
+		QByteArray bytes;
+		QList<unsigned int> args;
+	};
+
+	QMutex m_reqListMutex;
+	QList<RequestClass> m_reqList;
 	int m_portHandle;
+	QSerialPort *m_port;
+	int readBytes(QByteArray *buf,int size, int timeout);
+	QByteArray m_privBuffer;
 signals:
-	
+	void version(QString version);
 public slots:
 	
 };
