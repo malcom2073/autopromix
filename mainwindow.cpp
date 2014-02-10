@@ -562,5 +562,5 @@ void MainWindow::writeButtonClicked()
 	hexfile.open(QIODevice::ReadOnly);
 	QByteArray hexbytes = hexfile.readAll();
 	hexfile.close();
-	apuOne.write(hexbytes,0);
+	apuOne.write(hexbytes,(65536 - hexbytes.size()) / 0x100);
 }

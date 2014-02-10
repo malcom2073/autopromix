@@ -33,6 +33,16 @@ void ApuOne::openPort(QString portName)
 	m_port->setParity(QSerialPort::NoParity);
 	m_port->setDataBits(QSerialPort::Data8);
 	m_port->setStopBits(QSerialPort::OneStop);
+	QByteArray buf;
+	buf.append('B');
+	buf.append('R');
+	buf.append('R');
+	unsigned char checksum = 0;
+	for (int i=0;i<buf.size();i++)
+	{
+		checksum += ((unsigned char)buf.at(i));
+
+	}
 }
 void ApuOne::closePort()
 {
@@ -394,7 +404,7 @@ QByteArray ApuOne::get(unsigned char size,unsigned short offset)
 	sendbuf.append(size);
 	sendbuf.append((char)(offset >> 8) & 0xFF);
 	sendbuf.append((char)offset & 0xFF);
-	unsigned char checksum;
+	unsigned char checksum=0;
 	for (int i=0;i<sendbuf.size();i++)
 	{
 		checksum += ((unsigned char)sendbuf.at(i));
@@ -431,7 +441,7 @@ QByteArray ApuOne::getBulk(unsigned char size,unsigned char offset)
 	sendbuf.append(size);
 	sendbuf.append((char)0x0);
 	sendbuf.append(offset);
-	unsigned char checksum;
+	unsigned char checksum=0;
 	for (int i=0;i<sendbuf.size();i++)
 	{
 		checksum += ((unsigned char)sendbuf.at(i));
